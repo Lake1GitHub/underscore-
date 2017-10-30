@@ -5,7 +5,6 @@
 
 目录结构大致是以 underscore 文档的分类去做的 [文档传送门](http://www.bootcss.com/p/underscore/)
 
-大致分为： 集合(collections), 数组(Arrays), 函数(functions), 对象(objects), 工具函数(utility), 链式语法(chaining)
-
-
-
+大致分为：
+  总览( underscore.js ), 集合( collections.js ), 数组( Arrays.js ), 函数( functions.js ), 对象( objects.js )
+  工具函数( utility.js ), 链式语法( chaining.js )
