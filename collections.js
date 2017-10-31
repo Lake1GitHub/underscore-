@@ -1,3 +1,6 @@
+
+// 集合方法中的 obj 可以是数组或者对象
+
   // 遍历方法，大致思路为:类数组（类数组对象或者数组）就用索引遍历，普通对象就用键值遍历
 _.each = _.forEach = function(obj, iteratee, context){
   // 绑定 iteratee 迭代函数的上下文环境，
@@ -278,4 +281,37 @@ _.shuffle = function(obj){
     shuffled[rand] = set[index];
   }
   return shuffled;
+};
+
+// 选择 obj 中的一个随机样本，guard为保护参数，只要guard为true 则一定只返回一个数
+_.sample = function(obj, n, guard){
+  if(n == null || guard){
+    if(!isArrayLike(obj)) obj = _.values(obj);
+    return obj[_.random(obj.length - 1)];
+  }
+  return _.shuffle(obj).slice(0, Math.max(0, n));
+};
+
+// 获取 obj 的一个拷贝，如果 obj 为普通对象，则获取 值数组
+_.toArray = function(obj){
+  if(!obj) return [];
+  if(_.isArray(obj)) return slice.call(obj);
+  if(isArrayLike(obj)) return _.map(obj, _.identity);
+  return _.values(obj);
+};
+
+// 获取 obj 的长度，如果是普通对象，则获取 键数组长度
+_.size = function(obj){
+  if(obj == null) return 0;
+  return isArrayLike(obj) ? obj.length : _.keys(obj).length;
+}
+
+// 根据 obj 返回一个数组，数组的第一个元素为 通过断言函数的元素数组，第二个元素为没有通过的
+_.partition = function(obj, predicate, context){
+  predicate = cb(predicate, context);
+  var pass = [], fail = [];
+  _.each(obj, function(value, key, obj){
+    (predicate(value, key, obj) ? pass : fail).push(value);
+  });
+  return [pass, fail];
 };
