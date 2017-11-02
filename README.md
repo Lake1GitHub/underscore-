@@ -7,4 +7,4 @@
 
 大致分为：
   总览( underscore.js ), 集合( collections.js ), 数组( Arrays.js ), 函数( functions.js ), 对象( objects.js )
-  工具函数( utility.js ), 链式语法( chaining.js )
+  工具函数( utility.js ), 链式语法( chaining.js ).

@@ -100,3 +100,143 @@ _.delay = function(func, wait){
 // 因为setTimeout立即执行时会把 func推入栈，等到前面的事件全部结束时才会执行 func
 // 所以也就是栈清空之后执行 func.
 _.defer = _.partial(_.delay, _, 1);
+
+
+// 函数节流，func 在 wait 时间内至多调用一次
+_.throttle = function(func, wait, options){
+  var context, args, result;
+  var timeout = null;
+  var previous = 0;
+  if(!options) options = {};
+  // 最后一次的执行函数
+  var later = function(){
+    previous = options.leading === false ? 0 : _.now();
+    timeout = null;
+    result = func.apply(context, args);
+    if(!timeout) context = args = null;
+  };
+  // 方法直接返回一个函数，函数的作用就是对 func 的调用施加一个节流阀
+  return function(){}
+    var now = _.now();
+    // 判断是否初次调用，leading 为 false 时，第一次调用需等待 wait 毫秒
+    if(!previous && options.leading === false) previous = now;
+    // 计算剩余等待时间
+    var remaining = wait - (now - previous);
+    context = this;
+    args = arguments;
+    // 剩余等待时间小于等于 0
+    if(remaining <= 0 || remaining > wait){
+      // 将 setTimeout 重置
+      if(timeout){
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      // 直接调用 func 函数
+      previous = now;
+      result = func.apply(context, args);
+      if(!timeout) context = args = null;
+    }
+    // timeout 没有等待执行的函数时且设置了最后一次调用时
+    // 将 later 压入栈，设置 remaining 毫秒后执行
+    else if(!timeout && options.trailing !== false){
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+
+  // 函数防抖
+  _.debounce = function(func, wait, immediate){
+    var timeout, args, context, timestamp, result;
+
+    var later = function(){
+      // 计算剩余时间
+      var last = _.now() - timestamp;
+      if(last < wait && last >= 0){
+        // _.debounce 没有使用 clearTimeout，而是每次调用 later 时都判断，需不需要开始下次 setTimeout 等待
+        timeout = setTimeout(later, wait - last);
+      } else{
+        // 立即执行的方法和延时执行的方法是分开的，延时执行到达这里，如果设定了立即执行，这里只会把 timeout 设置为 null
+        // 而不会执行 func 函数，哪怕等待的时间已经够长了
+        timeout = null;
+        if(!immediate){
+          result = func.apply(context, args);
+          if(!timeout) context = args = null;
+        }
+      }
+    };
+
+    return function(){
+      context = this;
+      args = arguments;
+      // 每次调用都会更新 timestamp，从而达到阻碍函数调用的目的
+      timestamp = _.now();
+      // 是否立即执行
+      var callNow = immediate && !timeout;
+
+      // 这里 timeout 是一个锁，如果设置了立即执行，执行过程大致是：
+      // （1）立即执行 func 函数
+      // （2）在 last > wait 之后，解除 timeout 的绑定，在此期间任何调用都只会重置 last 的时间
+      // 如果是延时执行，执行过程大致是：
+      //      在 last > wait 之后，执行 func 函数，在此期间，任何调用都只会重置 last 的时间
+
+
+      if(!timeout) timeout = setTimeout(later, wait);
+      if(callNow){
+        result = func.apply(context, args);
+        context = args = null;
+      }
+      return result;
+    };
+  };
+
+  // 在 N 次调用后才执行 func
+  _.after = function(times, func){
+    return function(){
+      if(--times < 1){
+        return func.apply(this, arguments);
+      }
+    };
+  };
+
+  // func 至多调用 times-1次，后续调用都会返回第 times-1 次调用的结果
+  _.before = function(times, func){
+    var memo;
+    return function(){
+      if(--times > 0){
+        memo = func.apply(this, arguments);
+      }
+      if(times <= 1) func = null;
+      return memo;
+    };
+  };
+
+  // 只能调用一次的方法，其实也就是 before 至多调用 1 次的情况
+  _.once = _.partial(_.before, 2);
+
+  // 将 func 作为参数传给 wrapper，可以在调用 func 之前或者之后执行一些操作
+  _.wrap = function(func, wrapper){
+    return _.partial(wrapper, func);
+  }
+
+  将函数的返回值置反
+  _.negate = function(predicate){
+    return function(){
+      return !predicate.apply(this.arguments);
+    };
+  };
+
+  // 从最后一个到第一个函数，依次执行，每次执行后的返回值都传递给前一个作为其参数
+  // 最后返回第一个函数调用的结果
+  _.compose = function(){
+      var args = arguments;
+      var start = args.length - 1;
+      return function(){
+        var i = start;
+        // 执行最后一个函数，
+        var result = args[start].apply(this, arguments);
+        // 每次都将 result 传入 前一个函数作为其参数
+        while(i--) result = args[i].call(this, result);
+        // 最后返回第一个函数执行的结果
+        return result;
+      };
+  };
