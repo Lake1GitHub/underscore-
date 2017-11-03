@@ -34,6 +34,7 @@ function collectNonEnumProps(obj, keys){
 }
 
 // 获取 *自有属性* 的 key 值集合
+// 枚举->判断自有->处理bug
 _.keys = function(obj){
   if(!_.isObject(obj)) return [];
   if(nativeKeys) return nativeKeys(obj);
@@ -46,6 +47,7 @@ _.keys = function(obj){
 };
 
 // 获取 *所有属性,包括自有和继承* 的 key 值集合
+// 枚举->处理bug
 _.allKeys = function(obj){
   if(!_.isObject(obj)) return [];
   var keys = [];
