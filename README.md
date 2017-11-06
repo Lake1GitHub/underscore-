@@ -6,5 +6,5 @@
 目录结构大致是以 underscore 文档的分类去做的 [文档传送门](http://underscorejs.org/)，[中文版传送门](http://www.css88.com/doc/underscore1.8.2)
 
 大致分为：
-  总览( underscore.js ), 集合( collections.js ), 数组( Arrays.js ), 函数( functions.js ), 对象( objects.js )
-  工具函数( utility.js ), 链式语法( chaining.js ).
+  underscore配置( index.js ), 集合( collections.js ), 数组( Arrays.js ), 函数( functions.js ), 对象( objects.js )
+  工具函数( utility.js )

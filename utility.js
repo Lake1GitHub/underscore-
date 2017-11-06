@@ -40,7 +40,7 @@ _.noConflict = function(){
      return min + Math.floor(Math.random() * (max - min + 1));
  };
 
-// 扩展 underscore 函数库
+// 扩展 underscore 函数库，
  _.mixin = function(obj){
      // 传入 obj 对其中的所有方法，调用扩展函数
      _.each(_.functions(obj), function(name){
@@ -55,6 +55,9 @@ _.noConflict = function(){
          };
      });
  };
+
+// 使 underscore 支持面向对象形式的调用
+_.mixin(_);
 
  _.iteratee = function(value, context){
      return cb(value, context, Infinity);
@@ -94,6 +97,8 @@ var createEscaper = function(map){
 _.escape = createEscaper(escapeMap);
 _.unescape = createEscaper(unescapeMap);
 
+// 对 object[property] 调用 fallback，如果 object[property]本身是方法，则调用方法
+// 如果 object[property]不是方法，且fallback 为undefined，则返回 object[property];
 _.result = function(object, property, fallback){
     var value = object == null ? void 0 : object[property];
     if(value === void 0){
